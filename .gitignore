@@ -1,0 +1,11 @@
+﻿# .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.dbmdl
+*.Publish.xml
+
+# Local secrets
+appsettings.*.local.json
