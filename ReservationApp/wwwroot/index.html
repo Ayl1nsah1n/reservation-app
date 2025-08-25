@@ -1,0 +1,676 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Safran Sofrası Reservation</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --primary: #0ea5e9;
+            --ok: #10b981;
+            --warn: #f59e0b;
+            --err: #ef4444;
+            --border: #e5e7eb;
+            --input: #cbd5e1;
+            --chip-bg: #f1f5f9;
+            --chip-border: #e2e8f0;
+        }
+
+        html.dark {
+            --bg: #0b1220;
+            --panel: #0f172a;
+            --ink: #e5e7eb;
+            --muted: #94a3b8;
+            --primary: #38bdf8;
+            --ok: #22c55e;
+            --warn: #fbbf24;
+            --err: #ef4444;
+            --border: #1f2937;
+            --input: #334155;
+            --chip-bg: #111827;
+            --chip-border: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(255,255,255,.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border)
+        }
+
+        html.dark header {
+            background: rgba(15,23,42,.7)
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18px
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        input, select, button, textarea {
+            font: inherit
+        }
+
+            input[type=text], input[type=password], input[type=datetime-local], input[type=number], select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid var(--input);
+                border-radius: 10px;
+                background: var(--panel);
+                color: var(--ink)
+            }
+
+        button {
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer
+        }
+
+        .btn {
+            background: #0f172a;
+            color: #fff
+        }
+
+        html.dark .btn {
+            background: #1f2937
+        }
+
+        .btn:hover {
+            filter: brightness(.95)
+        }
+
+        .btn-ok {
+            background: var(--ok);
+            color: #fff
+        }
+
+        .btn-warn {
+            background: var(--warn);
+            color: #111
+        }
+
+        .btn-err {
+            background: var(--err);
+            color: #fff
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px
+        }
+
+        .cols-3 {
+            grid-template-columns: 1fr
+        }
+
+        @media(min-width:900px) {
+            .cols-3 {
+                grid-template-columns: 2fr 1fr 1fr
+            }
+
+            .cols-3.admin-wide {
+                    grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.04);
+            padding: 16px
+        }
+
+        html.dark .card {
+            box-shadow: none
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .list {
+            display: grid;
+            gap: 10px;
+            max-height: 280px;
+            overflow: auto
+        }
+
+        .chip {
+            font-size: 11px;
+            background: var(--chip-bg);
+            border: 1px solid var(--chip-border);
+            border-radius: 999px;
+            padding: 2px 8px
+        }
+
+        .flex {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .between {
+            justify-content: space-between
+        }
+
+        .mb8 {
+            margin-bottom: 8px
+        }
+
+        .mb16 {
+            margin-bottom: 16px
+        }
+
+        .mt8 {
+            margin-top: 8px
+        }
+
+        .mt16 {
+            margin-top: 16px
+        }
+
+        .title {
+            font-weight: 600;
+            margin: 0 0 8px
+        }
+
+        .note {
+            font-size: 12px
+        }
+
+        footer {
+            padding: 24px;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        .alert {
+            padding: 10px 12px;
+            border-radius: 10px
+        }
+
+        .alert-ok {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0
+        }
+
+        .alert-err {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca
+        }
+
+        .hidden {
+            display: none
+        }
+        /* ---- Auth hero (logo & welcome) ---- */
+        .hero {
+            padding: 28px 0 10px;
+            text-align: center
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px
+        }
+
+            .brand img {
+                width: 84px;
+                height: 84px;
+                border-radius: 18px;
+                box-shadow: 0 6px 18px rgba(0,0,0,.08)
+            }
+
+        .brand-name {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: .3px
+        }
+
+        .accent {
+            color: var(--primary)
+        }
+
+        .tagline {
+            margin-top: 6px;
+            color: var(--muted)
+        }
+    </style>
+</head>
+<body>
+    <!-- AUTH VIEW (first screen) -->
+    <div id="authView">
+        <header>
+            <div class="wrap row between">
+                <h1>Reservation • Auth</h1>
+                <div class="row">
+                    <button id="themeBtnAuth" class="btn" title="Tema değiştir">🌙 Dark</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="wrap grid" style="grid-template-columns:1fr;gap:16px">
+            <!-- Logo + karşılama alanı -->
+            <section class="hero">
+                <div class="brand">
+                    <img src="logo.png" alt="Safran Sofrası logosu" />
+                    <div class="brand-name"><span class="accent">Safran Sofrası</span> Restoranına Hoş Geldiniz</div>
+                </div>
+                <div class="tagline" id="welcomeText">Lütfen <strong id="welcomeAction">giriş yapın</strong>.</div>
+            </section>
+
+            <section class="card" id="authCard">
+                <div class="row mb16">
+                    <button class="btn" id="tabLogin">Login</button>
+                    <button class="" id="tabRegister">Register</button>
+                </div>
+                <div id="authLogin">
+                    <div class="grid" style="grid-template-columns:1fr;gap:8px">
+                        <input id="loginEmail" type="text" placeholder="Email" />
+                        <input id="loginPwd" type="password" placeholder="Password" />
+                        <button id="loginBtn" class="btn-ok">Login</button>
+                    </div>
+                </div>
+                <div id="authRegister" class="hidden">
+                    <div class="grid" style="grid-template-columns:1fr;gap:8px">
+                        <input id="regFull" type="text" placeholder="Full name" />
+                        <input id="regEmail" type="text" placeholder="Email" />
+                        <input id="regPwd" type="password" placeholder="Password" />
+                        <button id="regBtn" class="btn">Register</button>
+                    </div>
+                </div>
+                <div id="authMsg" class="note mt8 muted"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- APP VIEW (dashboard after login) -->
+    <div id="appView" class="hidden">
+        <header>
+            <div class="wrap row between">
+                <h1>Safran Sofrası • Reservation</h1>
+                <div class="row">
+                    <button id="themeBtnApp" class="btn" title="Tema değiştir">🌙 Dark</button>
+                    <div id="userBadge" class="muted"></div>
+                    <button id="logoutBtn" class="btn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main id="appMain" class="wrap grid cols-3 mt16">
+            <section class="card" id="reserveCard">
+                <h3 class="title">Create Reservation</h3>
+                <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
+                    <select id="resVenue"></select>
+                    <select id="resResource"></select>
+                    <input id="resStart" type="datetime-local" />
+                    <input id="resEnd" type="datetime-local" />
+                </div>
+                <div class="row mt8">
+                    <button id="createResBtn" class="btn-ok">Create</button>
+                    <span id="reserveMsg" class="note muted"></span>
+                </div>
+            </section>
+
+            <section class="card" id="adminCard">
+                <h3 class="title">Admin · Create Resource</h3>
+                <div class="grid" style="grid-template-columns:1fr;gap:8px">
+                    <select id="admVenue"></select>
+                    <input id="admName" type="text" placeholder="Name (e.g., Masa 1)" />
+                    <input id="admCap" type="number" min="1" value="4" />
+                    <button id="admCreate" class="btn">Create Resource</button>
+                    <div id="admMsg" class="note muted"></div>
+                </div>
+            </section>
+
+            <section class="card" id="venuesCard">
+                <h3 class="title">Venues & Resources</h3>
+                <div class="row mb8">
+                    <select id="vVenue" style="max-width:420px"></select>
+                    <button id="refreshVenues" class="btn">Refresh</button>
+                </div>
+                <div id="venuesMsg" class="note muted"></div>
+                <ul id="resList" class="list mt8"></ul>
+            </section>
+
+            <section class="card" id="mineCard" style="grid-column:1 / -1">
+                <div class="row between mb8">
+                    <h3 class="title">My Reservations</h3>
+                    <button id="refreshMine" class="btn">Refresh</button>
+                </div>
+                <div id="mineMsg" class="note muted"></div>
+                <ul id="mineList" class="list mt8"></ul>
+            </section>
+        </main>
+
+        <footer>Vanilla JS UI • works with your ASP.NET Core API</footer>
+    </div>
+
+    <script>
+    // ---- Config ----
+    const DEFAULT_API = ''; 
+
+    // ---- State & helpers ----
+    const $ = sel => document.querySelector(sel);
+
+    const storage = {
+      get api(){ return DEFAULT_API; }, set api(_v){},
+      get token(){ return localStorage.getItem('jwt') || ''; },
+      set token(v){ v ? localStorage.setItem('jwt', v) : localStorage.removeItem('jwt'); },
+      get me(){ const r = localStorage.getItem('me'); return r? JSON.parse(r) : null; },
+      set me(o){ o? localStorage.setItem('me', JSON.stringify(o)) : localStorage.removeItem('me'); },
+      get theme(){ return localStorage.getItem('theme') || ''; },
+      set theme(v){ v ? localStorage.setItem('theme', v) : localStorage.removeItem('theme'); }
+    };
+
+    function api(url, opts={}){ return fetch(storage.api + url, opts); }
+    async function safeJson(r){ try { return await r.json(); } catch { return null; } }
+    function toUtcString(localValue){ if(!localValue) return ''; const dt = new Date(localValue); const fixed = new Date(dt.getTime() - dt.getTimezoneOffset()*60000); return fixed.toISOString().replace('.000Z','Z'); }
+    function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+    // ---- Theme ----
+    function applyTheme(){
+      const t = storage.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', t==='dark');
+      const next = (t==='dark') ? '☀️ Light' : '🌙 Dark';
+      const a = $('#themeBtnAuth'); const b = $('#themeBtnApp');
+      if(a) a.textContent = next; if(b) b.textContent = next;
+    }
+    function toggleTheme(){
+      const t = (document.documentElement.classList.contains('dark')) ? 'dark' : 'light';
+      storage.theme = (t==='dark') ? 'light' : 'dark';
+      applyTheme();
+    }
+
+    // ---- Welcome text ----
+    function setWelcome(mode){
+      const el = $('#welcomeAction');
+      if(!el) return;
+      el.textContent = (mode === 'register') ? 'kayıt olun' : 'giriş yapın';
+    }
+
+    // ---- View switching ----
+    function showAuth(){
+      $('#authView').classList.remove('hidden');
+      $('#appView').classList.add('hidden');
+      setWelcome('login');
+    }
+        function showApp() {
+            $('#authView').classList.add('hidden');
+            $('#appView').classList.remove('hidden');
+
+            const me = storage.me;
+            const isAdmin = (me?.role === 'Admin');
+            $('#userBadge').textContent = `${me?.fullName || ''} • ${me?.role || ''}`;
+
+            const main = document.getElementById('appMain');
+            main.classList.toggle('admin-wide', isAdmin);
+
+            // Görünecek kartları role göre ayarla
+            $('#adminCard').style.display = isAdmin ? 'block' : 'none';  // Admin: Resource oluşturur
+            $('#venuesCard').style.display = 'block';                     // Herkes görür
+            $('#reserveCard').style.display = isAdmin ? 'none' : 'block'; // Sadece kullanıcı
+            $('#mineCard').style.display = isAdmin ? 'none' : 'block'; // Sadece kullanıcı
+
+            // Ortak veriler
+            loadVenues().then(() => loadResourcesFor($('#vVenue').value));
+
+            // Admin, kendi rezervasyon kartını görmez
+            if (!isAdmin) {
+                loadMine();
+            } else {
+                const list = $('#mineList'); if (list) list.innerHTML = '';
+            }
+        }
+
+
+    // ---- Auth events ----
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      if(storage.token) showApp(); else showAuth();
+
+      // Theme buttons
+      const t1 = $('#themeBtnAuth'); const t2 = $('#themeBtnApp');
+      if(t1) t1.addEventListener('click', toggleTheme);
+      if(t2) t2.addEventListener('click', toggleTheme);
+
+      // Tabs
+      $('#tabLogin').addEventListener('click', ()=>{ $('#authLogin').classList.remove('hidden'); $('#authRegister').classList.add('hidden'); setWelcome('login'); });
+      $('#tabRegister').addEventListener('click', ()=>{ $('#authLogin').classList.add('hidden'); $('#authRegister').classList.remove('hidden'); setWelcome('register'); });
+
+      // Login
+      $('#loginBtn').addEventListener('click', async ()=>{
+        const email = $('#loginEmail').value.trim(); const password = $('#loginPwd').value; $('#authMsg').textContent='';
+        try{
+          const r = await api('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+          if(!r.ok){ const b = await safeJson(r); throw new Error(b?.message || `Login failed (${r.status})`); }
+          const data = await r.json(); storage.token = data.token; storage.me = { fullName: data.fullName, role: data.role };
+          showApp();
+        }catch(e){ $('#authMsg').textContent = e.message; }
+      });
+
+      // Register
+      $('#regBtn').addEventListener('click', async ()=>{
+        const fullName = $('#regFull').value.trim(); const email = $('#regEmail').value.trim(); const password = $('#regPwd').value; $('#authMsg').textContent='';
+        try{
+          const r = await api('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ fullName, email, password }) });
+          if(!r.ok){ const b = await safeJson(r); throw new Error(b?.message || `Register failed (${r.status})`); }
+          $('#authMsg').textContent = 'Kayıt başarılı. Lütfen giriş yapın.'; $('#tabLogin').click();
+        }catch(e){ $('#authMsg').textContent = e.message; }
+      });
+
+      // Logout (only on dashboard)
+      $('#logoutBtn').addEventListener('click', ()=>{ storage.token=''; storage.me=null; showAuth(); });
+
+      // Dashboard: Venues & Resources public lists
+      $('#vVenue').addEventListener('change', e=> loadResourcesFor(e.target.value));
+      $('#refreshVenues').addEventListener('click', ()=>{ loadVenues().then(()=> loadResourcesFor($('#vVenue').value)); });
+
+      // Reservation form dependent resources
+      $('#resVenue').addEventListener('change', async e=>{
+        const venueId = e.target.value; const resSel = $('#resResource'); resSel.innerHTML=''; if(!venueId){ return; }
+        try{ const r = await api(`/api/venues/${venueId}/resources`); const data = await r.json(); resSel.innerHTML = ['<option value="">Select resource…</option>'].concat(data.map(x=>`<option value="${x.id}">${x.name} (cap ${x.capacity})</option>`)).join(''); }catch{ resSel.innerHTML=''; }
+      });
+
+      // Create reservation
+      $('#createResBtn').addEventListener('click', async ()=>{
+        const token = storage.token; if(!token){ $('#reserveMsg').textContent='Please login.'; showAuth(); return; }
+        const resourceId = $('#resResource').value; const start = $('#resStart').value; const end = $('#resEnd').value; $('#reserveMsg').textContent='';
+        if(!resourceId || !start || !end){ $('#reserveMsg').textContent='Fill all fields.'; return; }
+        try{
+          const r = await api('/api/reservations', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ resourceId, startTime: toUtcString(start), endTime: toUtcString(end) }) });
+          if(!r.ok){ const b = await safeJson(r); throw new Error(b?.message || `Failed (${r.status})`); }
+          const data = await r.json(); $('#reserveMsg').textContent = `Created for ${data.resourceName} (${new Date(data.startTime).toLocaleString()} - ${new Date(data.endTime).toLocaleString()}).`;
+          loadMine();
+        }catch(e){ $('#reserveMsg').textContent = e.message; }
+      });
+
+      // Admin create resource
+      $('#admCreate').addEventListener('click', async ()=>{
+        const token = storage.token; const me = storage.me; if(me?.role !== 'Admin'){ $('#admMsg').textContent='Admin required.'; return; }
+        const venueId = $('#admVenue').value; const name = $('#admName').value.trim(); const capacity = Number($('#admCap').value||0); $('#admMsg').textContent='';
+        try{
+          const r = await api('/api/resources', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ venueId, name, capacity }) });
+          if(r.status!==201){ const b = await safeJson(r); throw new Error(b?.message || `Failed (${r.status})`); }
+          $('#admMsg').textContent = 'Resource created.'; $('#admName').value=''; $('#admCap').value=4; loadResourcesFor($('#vVenue').value);
+        }catch(e){ $('#admMsg').textContent = e.message; }
+      });
+    });
+
+    // ---- Data loaders (used in app view) ----
+    async function loadVenues(){
+      const vSel = $('#vVenue'); const rSel = $('#resVenue'); const aSel = $('#admVenue');
+      vSel.innerHTML = ''; rSel.innerHTML = ''; aSel.innerHTML=''; $('#venuesMsg').textContent='';
+      try{
+        const r = await api('/api/venues'); const data = await r.json();
+        const opts = [ '<option value="">Select a venue…</option>' ].concat(data.map(v=>`<option value="${v.id}">${v.name} (${v.workingHours})</option>`));
+        vSel.innerHTML = opts.join(''); rSel.innerHTML = opts.join(''); aSel.innerHTML = opts.join('');
+      }catch{ $('#venuesMsg').textContent='Could not load venues.'; }
+    }
+
+        async function loadResourcesFor(venueId) {
+            const list = $('#resList'); list.innerHTML = '';
+            if (!venueId) { list.innerHTML = '<li class="muted">Select a venue to see resources.</li>'; return; }
+
+            const isAdmin = (storage.me?.role === 'Admin');
+
+            try {
+                const r = await api(`/api/venues/${venueId}/resources`);
+                if (r.status === 404) { list.innerHTML = '<li class="muted">Venue not found.</li>'; return; }
+                const data = await r.json();
+                if (data.length === 0) { list.innerHTML = '<li class="muted">No resources under this venue.</li>'; return; }
+
+                list.innerHTML = data.map(x => `
+      <li style="border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div>
+          <div style="font-weight:600">${escapeHtml(x.name)}</div>
+          <div class="note muted">Capacity: ${x.capacity}</div>
+        </div>
+        ${isAdmin ? `
+          <div class="row">
+            <button class="btn" data-edit="${x.id}">Edit</button>
+            <button class="btn-err" data-del="${x.id}">Delete</button>
+          </div>` : ''}
+      </li>`).join('');
+
+                if (isAdmin) {
+                    // DELETE /api/resources/{id}
+                    list.querySelectorAll('[data-del]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.dataset.del;
+                            if (!confirm('Bu kaynağı silmek istiyor musunuz? (Aktif rezervasyon varsa silinmez)')) return;
+                            const original = btn.textContent; btn.textContent = 'Deleting…'; btn.disabled = true;
+                            try {
+                                const res = await api(`/api/resources/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${storage.token}` } });
+                                if (res.status === 204) { await loadResourcesFor(venueId); return; }
+                                const b = await safeJson(res); throw new Error(b?.message || `Delete failed (${res.status})`);
+                            } catch (e) { alert(e.message); }
+                            finally { btn.textContent = original; btn.disabled = false; }
+                        });
+                    });
+
+                    // PUT /api/resources/{id} (inline edit)
+                    list.querySelectorAll('[data-edit]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.dataset.edit;
+                            try {
+                                // Detay çek (admin endpoint)
+                                const resp = await api(`/api/resources/${id}`, { headers: { Authorization: `Bearer ${storage.token}` } });
+                                if (!resp.ok) { const b = await safeJson(resp); throw new Error(b?.message || `Load failed (${resp.status})`); }
+                                const info = await resp.json();
+
+                                const li = btn.closest('li');
+                                li.innerHTML = `
+              <div class="grid" style="grid-template-columns:minmax(0,1fr) 160px; gap:8px; width:100%">
+                <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+                  <input name="name" type="text" value="${escapeHtml(info.name)}" />
+                  <input name="cap" type="number" min="1" value="${info.capacity}" />
+                </div>
+                <div class="row" style="justify-content:flex-end">
+                  <button class="btn-ok" data-save="${id}">Save</button>
+                  <button class="btn-warn" data-cancel>Cancel</button>
+                </div>
+              </div>`;
+
+                                const saveBtn = li.querySelector('[data-save]');
+                                const cancelBtn = li.querySelector('[data-cancel]');
+
+                                saveBtn.addEventListener('click', async () => {
+                                    const name = li.querySelector('input[name="name"]').value.trim();
+                                    const capacity = parseInt(li.querySelector('input[name="cap"]').value, 10);
+                                    const original2 = saveBtn.textContent; saveBtn.textContent = 'Saving…'; saveBtn.disabled = true;
+                                    try {
+                                        const put = await api(`/api/resources/${id}`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${storage.token}` },
+                                            body: JSON.stringify({ name, capacity })
+                                        });
+                                        if (put.status === 204) { await loadResourcesFor(venueId); return; }
+                                        const b = await safeJson(put); throw new Error(b?.message || `Update failed (${put.status})`);
+                                    } catch (e) { alert(e.message); }
+                                    finally { saveBtn.textContent = original2; saveBtn.disabled = false; }
+                                });
+
+                                cancelBtn.addEventListener('click', () => loadResourcesFor(venueId));
+                            } catch (e) { alert(e.message); }
+                        });
+                    });
+                }
+            } catch {
+                list.innerHTML = '<li class="muted">Failed to load resources.</li>';
+            }
+        }
+
+
+    async function loadMine(){
+      const token = storage.token; const list = $('#mineList'); if(!token){ list.innerHTML='<li class="muted">Login to see your reservations.</li>'; return; }
+      $('#mineMsg').textContent='';
+      try{
+        const r = await api('/api/reservations', { headers:{ Authorization:`Bearer ${token}` }});
+        if(!r.ok){ throw new Error(`Failed (${r.status})`); }
+        const data = await r.json();
+        if(data.length===0){ list.innerHTML='<li class="muted">No reservations yet.</li>'; return; }
+          list.innerHTML = data.map(x => {
+              // API hem sayısal (0/1) hem metinsel ("Confirmed"/"Cancelled") dönebilir
+              const isConfirmed = (x.status === 0 || x.status === 'Confirmed');
+              const statusText = (x.status === 0 || x.status === 'Confirmed') ? 'Confirmed'
+                  : (x.status === 1 || x.status === 'Cancelled') ? 'Cancelled'
+                      : String(x.status);
+
+              return `
+    <li class="flex between" style="border:1px solid var(--border);border-radius:10px;padding:10px">
+      <div class="note">
+        <div style="font-weight:600">${escapeHtml(x.resource)}</div>
+        <div class="muted">${new Date(x.startTime).toLocaleString()} – ${new Date(x.endTime).toLocaleString()}</div>
+        <div class="muted">Status: ${statusText}</div>
+      </div>
+      <div class="row">
+        <span class="chip">${x.id}</span>
+        ${isConfirmed ? `<button data-id="${x.id}" class="btn-err">Cancel</button>` : ''}
+      </div>
+    </li>`;
+          }).join('');
+        document.querySelectorAll('#mineList button.btn-err').forEach(btn=>{
+          btn.addEventListener('click', async ()=>{
+            try{ const r = await api(`/api/reservations/${btn.dataset.id}`, { method:'DELETE', headers:{ Authorization:`Bearer ${storage.token}` }}); if(r.status!==204){ const b=await safeJson(r); throw new Error(b?.message||`Cancel failed (${r.status})`); } loadMine(); }catch(e){ alert(e.message); }
+          });
+        });
+      }catch(e){ $('#mineMsg').textContent = e.message; }
+    }
+    </script>
+</body>
+</html>

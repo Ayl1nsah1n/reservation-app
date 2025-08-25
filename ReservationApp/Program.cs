@@ -73,6 +73,9 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedAsync(db);
 }
 
+app.UseDefaultFiles();   
+app.UseStaticFiles();
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -80,5 +83,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
